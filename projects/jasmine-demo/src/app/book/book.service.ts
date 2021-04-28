@@ -14,6 +14,18 @@ export class BookService {
   @Select(BookState.books)
   books$!: Observable<Book[]>;
 
+  getBooks(): Observable<Book[]> {
+    return this.store.select(BookState.books);
+  }
+
+  getBooksOnce(): Observable<Book[]> {
+    return this.store.selectOnce(BookState.books);
+  }
+
+  getBooksSnapshot(): Book[] {
+    return this.store.selectSnapshot(BookState.books);
+  }
+
   addBook(book: Book): void {
     this.store.dispatch(new AddBook(book));
   }
