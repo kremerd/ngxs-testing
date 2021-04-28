@@ -3,8 +3,46 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
+    "ngxs-testing": {
+      "projectType": "library",
+      "root": "projects/ngxs-testing",
+      "sourceRoot": "projects/ngxs-testing/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "tsConfig": "projects/ngxs-testing/tsconfig.lib.json",
+            "project": "projects/ngxs-testing/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ngxs-testing/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/ngxs-testing/src/test.ts",
+            "tsConfig": "projects/ngxs-testing/tsconfig.spec.json",
+            "karmaConfig": "projects/ngxs-testing/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "projects/ngxs-testing/**/*.ts",
+              "projects/ngxs-testing/**/*.html"
+            ]
+          }
+        }
+      }
+    }
   },
   "cli": {
     "defaultCollection": "@angular-eslint/schematics"
-  }
+  },
+  "defaultProject": "ngxs-testing"
 }
