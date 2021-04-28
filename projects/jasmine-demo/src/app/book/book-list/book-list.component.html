@@ -1,0 +1,18 @@
+<ul>
+  <li *ngFor="let book of books$ | async">
+    {{ book.title }} by {{ book.author }}
+    (<a href="#" (click)="deleteBook(book)">delete</a>)
+  </li>
+</ul>
+
+<form #f="ngForm" (submit)="addBook(f.value); f.reset()">
+  <div>
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" ngModel>
+  </div>
+  <div>
+    <label for="author">Author</label>
+    <input type="text" id="author" name="author" ngModel>
+  </div>
+  <button type="submit">Add book</button>
+</form>
