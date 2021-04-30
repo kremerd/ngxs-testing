@@ -30,6 +30,20 @@ export class BookService {
     this.store.dispatch(new AddBook(book));
   }
 
+  addFirstLaw(): void {
+    this.store.dispatch([
+      new AddBook({ title: 'The Blade Itself', author: 'Joe Abercrombie' }),
+      new AddBook({
+        title: 'Before They Are Hanged',
+        author: 'Joe Abercrombie',
+      }),
+      new AddBook({
+        title: 'Last Argument Of Kings',
+        author: 'Joe Abercrombie',
+      }),
+    ]);
+  }
+
   deleteBook(book: Book): void {
     this.store.dispatch(new DeleteBook(book));
   }
