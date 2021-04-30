@@ -16,4 +16,9 @@ export class NgxsTestBed {
     this.store.setSelectorValue(selector, value);
     return this;
   }
+
+  setSelectorError(selector: any, error: any): NgxsTestBed {
+    this.store.setSelectorError(selector, error);
+    return this;
+  }
 }

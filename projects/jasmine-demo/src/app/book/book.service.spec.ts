@@ -38,6 +38,14 @@ describe('BookService', () => {
       });
     });
 
+    it('should return an error observable when books are mocked to error', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorError(BookState.books, new Error('Test'));
+        const books$ = service.books$;
+        rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
+      });
+    });
+
     it('should allow to change the books over time', () => {
       runWithTestScheduler((rh) => {
         ngxsTestBed.setSelectorValue(BookState.books, []);
@@ -53,6 +61,36 @@ describe('BookService', () => {
           y: [buildBook('1')],
           z: [buildBook('2')],
         });
+      });
+    });
+
+    it('should allow to error at a later point in time', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorValue(BookState.books, []);
+        const books$ = service.books$;
+        rh.cold('10ms x').subscribe(() =>
+          ngxsTestBed.setSelectorValue(BookState.books, [buildBook()])
+        );
+        rh.cold('20ms x').subscribe(() =>
+          ngxsTestBed.setSelectorError(BookState.books, new Error('Test'))
+        );
+        rh.expectObservable(books$).toBe(
+          'x 9ms y 9ms #',
+          {
+            x: [],
+            y: [buildBook()],
+          },
+          new Error('Test')
+        );
+      });
+    });
+
+    it('should allow to reset errors', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorError(BookState.books, new Error('Test'));
+        ngxsTestBed.setSelectorValue(BookState.books, [buildBook()]);
+        const books$ = service.books$;
+        rh.expectObservable(books$).toBe('x', { x: [buildBook()] });
       });
     });
   });
@@ -73,6 +111,14 @@ describe('BookService', () => {
       });
     });
 
+    it('should return an error observable when books are mocked to error', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorError(BookState.books, new Error('Test'));
+        const books$ = service.getBooks();
+        rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
+      });
+    });
+
     it('should allow to change the books over time', () => {
       runWithTestScheduler((rh) => {
         ngxsTestBed.setSelectorValue(BookState.books, []);
@@ -88,6 +134,36 @@ describe('BookService', () => {
           y: [buildBook('1')],
           z: [buildBook('2')],
         });
+      });
+    });
+
+    it('should allow to error at a later point in time', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorValue(BookState.books, []);
+        const books$ = service.getBooks();
+        rh.cold('10ms x').subscribe(() =>
+          ngxsTestBed.setSelectorValue(BookState.books, [buildBook()])
+        );
+        rh.cold('20ms x').subscribe(() =>
+          ngxsTestBed.setSelectorError(BookState.books, new Error('Test'))
+        );
+        rh.expectObservable(books$).toBe(
+          'x 9ms y 9ms #',
+          {
+            x: [],
+            y: [buildBook()],
+          },
+          new Error('Test')
+        );
+      });
+    });
+
+    it('should allow to reset errors', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorError(BookState.books, new Error('Test'));
+        ngxsTestBed.setSelectorValue(BookState.books, [buildBook()]);
+        const books$ = service.getBooks();
+        rh.expectObservable(books$).toBe('x', { x: [buildBook()] });
       });
     });
   });
@@ -107,6 +183,14 @@ describe('BookService', () => {
         rh.expectObservable(books$).toBe('(x|)', { x: [buildBook()] });
       });
     });
+
+    it('should return an error observable when books are mocked to error', () => {
+      runWithTestScheduler((rh) => {
+        ngxsTestBed.setSelectorError(BookState.books, new Error('Test'));
+        const books$ = service.getBooksOnce();
+        rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
+      });
+    });
   });
 
   describe('selectBooksSnapshot', () => {
@@ -123,6 +207,17 @@ describe('BookService', () => {
       ngxsTestBed.setSelectorValue(BookState.books, [buildBook()]);
       const books = service.getBooksSnapshot();
       expect(books).toEqual([buildBook()]);
+    });
+
+    it('should throw an error when books are mocked to error', () => {
+      const error = new Error('Test');
+      ngxsTestBed.setSelectorError(BookState.books, error);
+      try {
+        service.getBooksSnapshot();
+        fail('Expected getBooksSnapshot to throw an error');
+      } catch (e) {
+        expect(e).toBe(error);
+      }
     });
   });
 
