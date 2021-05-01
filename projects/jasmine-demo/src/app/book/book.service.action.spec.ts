@@ -25,6 +25,10 @@ describe('BookService', () => {
     expect(getDispatchedActions()).toEqual([]);
   });
 
+  it('should not have dispatched any action on init', () => {
+    expect().noActionsToHaveBeenDispatched();
+  });
+
   describe('addBook simple', () => {
     it('should dispatch an instance of AddBook', () => {
       service.addBook(buildBook());
@@ -178,6 +182,53 @@ describe('BookService', () => {
     it('should not dispatch an instance of DeleteBook thrice', () => {
       service.addFirstLaw();
       expect(jasmine.any(DeleteBook)).not.toHaveBeenDispatchedTimes(3);
+    });
+  });
+
+  describe('addFirstLaw terminal', () => {
+    it('should dispatch AddBook, AddBook, AddBook, and no other actions', () => {
+      service.addFirstLaw();
+      expect(jasmine.any(AddBook)).toHaveBeenDispatched();
+      expect(jasmine.any(AddBook)).toHaveBeenDispatched();
+      expect(jasmine.any(AddBook)).toHaveBeenDispatched();
+      expect().allDispatchedActionsToHaveBeenExpected();
+    });
+
+    it('should dispatch AddBook thrice, and no other actions', () => {
+      service.addFirstLaw();
+      expect(jasmine.any(AddBook)).toHaveBeenDispatchedTimes(3);
+      expect().allDispatchedActionsToHaveBeenExpected();
+    });
+  });
+
+  describe('deleteBook simple', () => {
+    it('should dispatch an instance of DeleteBook', () => {
+      service.deleteBook(buildBook());
+      expect(jasmine.any(DeleteBook)).toHaveBeenDispatched();
+    });
+
+    it('should dispatch a specific DeleteBook instance', () => {
+      service.deleteBook(buildBook());
+      expect(new DeleteBook(buildBook())).toHaveBeenDispatched();
+    });
+
+    it('should add one item to the list of dispatched actions', () => {
+      service.deleteBook(buildBook());
+      expect(getDispatchedActions()).toEqual([new DeleteBook(buildBook())]);
+    });
+  });
+
+  describe('deleteBook terminal', () => {
+    it('should dispatch an instance of DeleteBook, and no other actions', () => {
+      service.deleteBook(buildBook());
+      expect(jasmine.any(DeleteBook)).toHaveBeenDispatched();
+      expect().allDispatchedActionsToHaveBeenExpected();
+    });
+
+    it('should dispatch an instance of DeleteBook once, and no other actions', () => {
+      service.deleteBook(buildBook());
+      expect(jasmine.any(DeleteBook)).toHaveBeenDispatchedTimes(1);
+      expect().allDispatchedActionsToHaveBeenExpected();
     });
   });
 

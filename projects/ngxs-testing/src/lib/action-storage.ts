@@ -17,6 +17,16 @@ export class ActionStorage {
     });
   }
 
+  static checkActions(
+    amount: number,
+    predicate: (action: any) => boolean
+  ): void {
+    ActionStorage.recordedActions
+      .filter(({ action, checked }) => predicate(action) && !checked)
+      .filter((_, i) => i < amount)
+      .forEach((recordedAction) => (recordedAction.checked = true));
+  }
+
   static getAllActions(): any[] {
     return ActionStorage.recordedActions.map(({ action }) => action);
   }
