@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
+import { defer, Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { ActionStorage } from './action-storage';
 import { SelectorStorage } from './selector-storage';
@@ -17,13 +17,13 @@ export class MockStore extends Store {
   }
 
   select(selector: any): Observable<any> {
-    return SelectorStorage.getSelectorSubject(selector).asObservable();
+    return defer(() => SelectorStorage.getSelectorSubject(selector));
   }
 
   selectOnce(selector: any): Observable<any> {
-    return SelectorStorage.getSelectorSubject(selector)
-      .asObservable()
-      .pipe(take(1));
+    return defer(() => SelectorStorage.getSelectorSubject(selector)).pipe(
+      take(1)
+    );
   }
 
   selectSnapshot(selector: any): any {

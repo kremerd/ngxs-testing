@@ -30,7 +30,7 @@ describe('BookService', () => {
       });
     });
 
-    it('should be a non-completing observable of the currently mocked books', () => {
+    it('should be a non-completing observable if mocked before retrieval', () => {
       runWithTestScheduler((rh) => {
         mockSelector(BookState.books).toReturn([buildBook()]);
         const books$ = service.books$;
@@ -38,7 +38,15 @@ describe('BookService', () => {
       });
     });
 
-    it('should return an error observable when books are mocked to error', () => {
+    it('should be a non-completing observable if mocked before subscription', () => {
+      runWithTestScheduler((rh) => {
+        const books$ = service.books$;
+        mockSelector(BookState.books).toReturn([buildBook()]);
+        rh.expectObservable(books$).toBe('x', { x: [buildBook()] });
+      });
+    });
+
+    it('should be an error observable if mocked to error before retrieval', () => {
       runWithTestScheduler((rh) => {
         mockSelector(BookState.books).toError(new Error('Test'));
         const books$ = service.books$;
@@ -46,10 +54,18 @@ describe('BookService', () => {
       });
     });
 
+    it('should be an error observable if mocked to error before subscription', () => {
+      runWithTestScheduler((rh) => {
+        const books$ = service.books$;
+        mockSelector(BookState.books).toError(new Error('Test'));
+        rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
+      });
+    });
+
     it('should allow to change the books over time', () => {
       runWithTestScheduler((rh) => {
-        mockSelector(BookState.books).toReturn([]);
         const books$ = service.books$;
+        mockSelector(BookState.books).toReturn([]);
         rh.cold('10ms x').subscribe(() =>
           mockSelector(BookState.books).toReturn([buildBook('1')])
         );
@@ -66,8 +82,8 @@ describe('BookService', () => {
 
     it('should allow to error at a later point in time', () => {
       runWithTestScheduler((rh) => {
-        mockSelector(BookState.books).toReturn([]);
         const books$ = service.books$;
+        mockSelector(BookState.books).toReturn([]);
         rh.cold('10ms x').subscribe(() =>
           mockSelector(BookState.books).toReturn([buildBook()])
         );
@@ -87,15 +103,19 @@ describe('BookService', () => {
 
     it('should allow to reset errors', () => {
       runWithTestScheduler((rh) => {
+        const books$ = service.books$;
         mockSelector(BookState.books).toError(new Error('Test'));
         mockSelector(BookState.books).toReturn([buildBook()]);
-        const books$ = service.books$;
         rh.expectObservable(books$).toBe('x', { x: [buildBook()] });
       });
     });
   });
 
-  describe('selectBooks', () => {
+  describe('getBooks', () => {
+    it('should return a new Observable on each call', () => {
+      expect(service.getBooks()).not.toBe(service.getBooks());
+    });
+
     it('should return an error observable when books are not mocked', () => {
       runWithTestScheduler((rh) => {
         const books$ = service.getBooks();
@@ -103,7 +123,7 @@ describe('BookService', () => {
       });
     });
 
-    it('should return a non-completing observable of the currently mocked books', () => {
+    it('should return a non-completing observable if mocked before being called', () => {
       runWithTestScheduler((rh) => {
         mockSelector(BookState.books).toReturn([buildBook()]);
         const books$ = service.getBooks();
@@ -111,7 +131,15 @@ describe('BookService', () => {
       });
     });
 
-    it('should return an error observable when books are mocked to error', () => {
+    it('should return a non-completing observable if mocked before subscription', () => {
+      runWithTestScheduler((rh) => {
+        const books$ = service.getBooks();
+        mockSelector(BookState.books).toReturn([buildBook()]);
+        rh.expectObservable(books$).toBe('x', { x: [buildBook()] });
+      });
+    });
+
+    it('should return an error observable if mocked to error before being called', () => {
       runWithTestScheduler((rh) => {
         mockSelector(BookState.books).toError(new Error('Test'));
         const books$ = service.getBooks();
@@ -119,10 +147,18 @@ describe('BookService', () => {
       });
     });
 
+    it('should return an error observable if mocked to error before subscription', () => {
+      runWithTestScheduler((rh) => {
+        const books$ = service.getBooks();
+        mockSelector(BookState.books).toError(new Error('Test'));
+        rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
+      });
+    });
+
     it('should allow to change the books over time', () => {
       runWithTestScheduler((rh) => {
-        mockSelector(BookState.books).toReturn([]);
         const books$ = service.getBooks();
+        mockSelector(BookState.books).toReturn([]);
         rh.cold('10ms x').subscribe(() =>
           mockSelector(BookState.books).toReturn([buildBook('1')])
         );
@@ -139,8 +175,8 @@ describe('BookService', () => {
 
     it('should allow to error at a later point in time', () => {
       runWithTestScheduler((rh) => {
-        mockSelector(BookState.books).toReturn([]);
         const books$ = service.getBooks();
+        mockSelector(BookState.books).toReturn([]);
         rh.cold('10ms x').subscribe(() =>
           mockSelector(BookState.books).toReturn([buildBook()])
         );
@@ -160,15 +196,19 @@ describe('BookService', () => {
 
     it('should allow to reset errors', () => {
       runWithTestScheduler((rh) => {
+        const books$ = service.getBooks();
         mockSelector(BookState.books).toError(new Error('Test'));
         mockSelector(BookState.books).toReturn([buildBook()]);
-        const books$ = service.getBooks();
         rh.expectObservable(books$).toBe('x', { x: [buildBook()] });
       });
     });
   });
 
-  describe('selectBooksOnce', () => {
+  describe('getBooksOnce', () => {
+    it('should return a new Observable on each call', () => {
+      expect(service.getBooksOnce()).not.toBe(service.getBooksOnce());
+    });
+
     it('should return an error observable when books are not mocked', () => {
       runWithTestScheduler((rh) => {
         const books$ = service.getBooksOnce();
@@ -176,7 +216,7 @@ describe('BookService', () => {
       });
     });
 
-    it('should return a one-emit observable of the currently mocked books', () => {
+    it('should return a one-emit observable if mocked before being called', () => {
       runWithTestScheduler((rh) => {
         mockSelector(BookState.books).toReturn([buildBook()]);
         const books$ = service.getBooksOnce();
@@ -184,16 +224,32 @@ describe('BookService', () => {
       });
     });
 
-    it('should return an error observable when books are mocked to error', () => {
+    it('should return a one-emit observable if mocked before being subscription', () => {
+      runWithTestScheduler((rh) => {
+        const books$ = service.getBooksOnce();
+        mockSelector(BookState.books).toReturn([buildBook()]);
+        rh.expectObservable(books$).toBe('(x|)', { x: [buildBook()] });
+      });
+    });
+
+    it('should return an error observable if mocked to error before being called', () => {
       runWithTestScheduler((rh) => {
         mockSelector(BookState.books).toError(new Error('Test'));
         const books$ = service.getBooksOnce();
         rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
       });
     });
+
+    it('should return an error observable if mocked to error before subscription', () => {
+      runWithTestScheduler((rh) => {
+        const books$ = service.getBooksOnce();
+        mockSelector(BookState.books).toError(new Error('Test'));
+        rh.expectObservable(books$).toBe('#', undefined, new Error('Test'));
+      });
+    });
   });
 
-  describe('selectBooksSnapshot', () => {
+  describe('getBooksSnapshot', () => {
     it('should throw an error when books are not mocked', () => {
       try {
         service.getBooksSnapshot();
@@ -203,13 +259,13 @@ describe('BookService', () => {
       }
     });
 
-    it('should return a snapshot of the currently mocked books', () => {
+    it('should return a snapshot if mocked before being called', () => {
       mockSelector(BookState.books).toReturn([buildBook()]);
       const books = service.getBooksSnapshot();
       expect(books).toEqual([buildBook()]);
     });
 
-    it('should throw an error when books are mocked to error', () => {
+    it('should throw an error if mocked to error before being called', () => {
       const error = new Error('Test');
       mockSelector(BookState.books).toError(error);
       try {
