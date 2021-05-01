@@ -1,5 +1,8 @@
 import { TestBed } from '@angular/core/testing';
-import { NgxsTestingModule } from 'projects/ngxs-testing/src/public-api';
+import {
+  getDispatchedActions,
+  NgxsTestingModule,
+} from 'projects/ngxs-testing/src/public-api';
 import { AddBook, DeleteBook } from './book.actions';
 import { BookService } from './book.service';
 import { Book } from './model';
@@ -16,6 +19,10 @@ describe('BookService', () => {
 
   it('should create', () => {
     expect(service).toBeTruthy();
+  });
+
+  it('should have an empty list of dispatched actions on init', () => {
+    expect(getDispatchedActions()).toEqual([]);
   });
 
   describe('addBook simple', () => {
@@ -37,6 +44,11 @@ describe('BookService', () => {
     it('should not dispatch a specific DeleteBook instance', () => {
       service.addBook(buildBook());
       expect(new DeleteBook(buildBook())).not.toHaveBeenDispatched();
+    });
+
+    it('should add one item to the list of dispatched actions', () => {
+      service.addBook(buildBook());
+      expect(getDispatchedActions()).toEqual([new AddBook(buildBook())]);
     });
   });
 
@@ -82,7 +94,7 @@ describe('BookService', () => {
       service.addFirstLaw();
       expect(
         new AddBook({
-          title: 'Before They Are Hanged',
+          title: 'The Blade Itself',
           author: 'Joe Abercrombie',
         })
       ).toHaveBeenDispatched();
@@ -111,6 +123,24 @@ describe('BookService', () => {
     it('should not dispatch an instance of DeleteBook', () => {
       service.addFirstLaw();
       expect(jasmine.any(DeleteBook)).not.toHaveBeenDispatched();
+    });
+
+    it('should add three items to the list of dispatched actions', () => {
+      service.addFirstLaw();
+      expect(getDispatchedActions()).toEqual([
+        new AddBook({
+          title: 'The Blade Itself',
+          author: 'Joe Abercrombie',
+        }),
+        new AddBook({
+          title: 'Before They Are Hanged',
+          author: 'Joe Abercrombie',
+        }),
+        new AddBook({
+          title: 'Last Argument Of Kings',
+          author: 'Joe Abercrombie',
+        }),
+      ]);
     });
   });
 

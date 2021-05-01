@@ -1,7 +1,16 @@
+import { getDispatchedActions } from './lib/get-dispatched-actions';
+import './lib/jasmine-matchers';
+import { mockSelector } from './lib/mock-selector';
+import { NgxsTestingModule } from './lib/ngxs-testing.module';
+
 /*
  * Public API Surface of ngxs-testing
  */
 
-import './lib/jasmine-matchers';
-export * from './lib/mock-selector';
-export * from './lib/ngxs-testing.module';
+export { getDispatchedActions, mockSelector, NgxsTestingModule };
+
+export default {
+  getDispatchedActions,
+  mockSelector,
+  NgxsTestingModule,
+};
