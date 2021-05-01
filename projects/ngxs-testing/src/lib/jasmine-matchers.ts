@@ -10,61 +10,30 @@ declare global {
 }
 
 const toHaveBeenDispatched = (
-  util: jasmine.MatchersUtil,
-  customTesters: readonly jasmine.CustomEqualityTester[]
+  util: jasmine.MatchersUtil
 ): jasmine.CustomMatcher => ({
-  compare: (action: any): jasmine.CustomMatcherResult => {
-    if (util.contains(ActionStorage.getAllActions(), action, customTesters)) {
-      return {
-        pass: true,
-        message: util.buildFailureMessage(
-          'to have been dispatched',
-          true,
-          action
-        ),
-      };
-    } else {
-      return {
-        pass: false,
-        message: util.buildFailureMessage(
-          'to have been dispatched',
-          false,
-          action
-        ),
-      };
-    }
-  },
+  compare: (action: any): jasmine.CustomMatcherResult => ({
+    pass: util.contains(ActionStorage.getAllActions(), action),
+  }),
 });
 
 const toHaveBeenDispatchedTimes = (
-  util: jasmine.MatchersUtil,
-  customTesters: readonly jasmine.CustomEqualityTester[]
+  util: jasmine.MatchersUtil
 ): jasmine.CustomMatcher => ({
   compare: (action: any, expected: number): jasmine.CustomMatcherResult => {
     const matchingActions = ActionStorage.getAllActions().filter((a) =>
-      util.equals(a, action, customTesters)
+      util.equals(a, action)
     );
-    if (matchingActions.length === expected) {
-      return {
-        pass: true,
-        message: buildTimesFailureMessage(
-          util.pp(action),
-          true,
-          matchingActions.length,
-          expected
-        ),
-      };
-    } else {
-      return {
-        pass: false,
-        message: buildTimesFailureMessage(
-          util.pp(action),
-          false,
-          matchingActions.length,
-          expected
-        ),
-      };
-    }
+    const pass = matchingActions.length === expected;
+    return {
+      pass,
+      message: buildTimesFailureMessage(
+        util.pp(action),
+        pass,
+        matchingActions.length,
+        expected
+      ),
+    };
   },
 });
 
